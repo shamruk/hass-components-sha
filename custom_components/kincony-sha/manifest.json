@@ -1,7 +1,7 @@
 {
   "domain": "kincony-sha",
   "name": "Kincony Sha",
-  "documentation": "",
+  "documentation": "https://github.com/shamruk/hass-components-sha",
   "requirements": [],
   "dependencies": [],
   "codeowners": []
