@@ -9,8 +9,8 @@ import subprocess
 import logging
 import threading
 from homeassistant.const import (
-    CONF_HOST,
-    CONF_PORT,
+	CONF_HOST,
+	CONF_PORT,
 )
 
 DATA_DEVICE_REGISTER = "k_device_register"
@@ -26,6 +26,7 @@ class KTransport(object):
 	def __init__(self):
 		super(KTransport, self).__init__()
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.s.settimeout(5)
 		self.connected = False
 
 	def _send(self, command):
@@ -49,11 +50,18 @@ class KTransport(object):
 			self._send(command)
 		except BrokenPipeError:
 			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.s.settimeout(5)
 			self.connected = False
 			time.sleep(3)
 			self.call(command)
 
-		result = self._read()
+		try:
+			result = self._read()
+		except:
+			_LOGGER.error("socket read error")
+			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.s.settimeout(5)
+			self.connected = False
 
 		return result
 
