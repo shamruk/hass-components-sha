@@ -8,7 +8,7 @@ Place the files you downloaded in the new directory (folder) you created.
 
 Add to `configuration.yaml`
 
-And don't forget to set device IP istead of 192.168.1.103
+And don't forget to set device IP istead of `192.168.1.103`
 
 ```
 switch:
