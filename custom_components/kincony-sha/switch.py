@@ -42,12 +42,11 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 	devices = config.get(CONF_SWITCHES, {})
 	switches = []
 
-	try:
-		_LOGGER.warning(config.get(CONF_HOST, {}))
-		_LOGGER.warning(config.get(CONF_PORT, {}))
-	except:
-		_LOGGER.warning("fail")
-
+	host = config.get(CONF_HOST, {})
+	port = config.get(CONF_PORT, {})
+	address = (host, port)
+	transport = hass.data[DATA_DEVICE_REGISTER]
+	transport.setAddress(address)
 
 	for object_id, device_config in devices.items():
 
@@ -57,6 +56,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 				object_id,
 				device_config.get(CONF_FRIENDLY_NAME, object_id),
 				device_config.get("k_id"),
+				transport,
 			)
 		)
 
@@ -76,6 +76,7 @@ class CommandSwitch(SwitchDevice):
 		object_id,
 		friendly_name,
 		k_id,
+		transport,
 	):
 		"""Initialize the switch."""
 		self._hass = hass
@@ -83,7 +84,7 @@ class CommandSwitch(SwitchDevice):
 		self._name = friendly_name
 		self._state = False
 		self._k_id = k_id
-		self._clinet = KConnection(hass.data[DATA_DEVICE_REGISTER], k_id, hass.data[DATA_DEVICE_REGISTER_LOCK])
+		self._clinet = KConnection(transport, k_id, hass.data[DATA_DEVICE_REGISTER_LOCK])
 
 	@property
 	def should_poll(self):

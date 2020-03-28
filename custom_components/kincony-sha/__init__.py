@@ -23,9 +23,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class KTransport(object):
 	"""docstring for KTransport"""
-	def __init__(self, address):
+	def __init__(self):
 		super(KTransport, self).__init__()
-		self.address = address
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.connected = False
 
@@ -34,6 +33,9 @@ class KTransport(object):
 
 	def _read(self):
 		return self.s.recv(1024).decode('utf-8')
+
+	def setAddress(self, address):
+		self.address = address
 
 	def call(self, command):
 		if (not self.connected):
@@ -58,17 +60,7 @@ class KTransport(object):
 
 async def async_setup(hass, config):
 	_LOGGER.info("k init")
-	try:
-		_LOGGER.warning(config.get(CONF_HOST, {}))
-		_LOGGER.warning(config.get(CONF_PORT, {}))
-	except:
-		_LOGGER.warning("fail")
-	host = '192.168.1.103'
-	#config[DOMAIN][CONF_HOST]
-	port = 4196
-	#config[DOMAIN][CONF_PORT]
-	address = (host, port)
-	hass.data[DATA_DEVICE_REGISTER] = KTransport(address)
+	hass.data[DATA_DEVICE_REGISTER] = KTransport()
 	hass.data[DATA_DEVICE_REGISTER_LOCK] = threading.Lock()
 	return True
 
