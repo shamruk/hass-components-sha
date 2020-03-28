@@ -1,17 +1,17 @@
-"""Support for custom shell commands to turn a switch on/off."""
+"""Support for custom shell commands to turn a light on/off."""
 import logging
 import subprocess
 
 import voluptuous as vol
 
-from homeassistant.components.switch import (
+from homeassistant.components.light import (
+	Light,
 	ENTITY_ID_FORMAT,
 	PLATFORM_SCHEMA,
-	SwitchDevice,
 )
 from homeassistant.const import (
 	CONF_FRIENDLY_NAME,
-	CONF_SWITCHES,
+	CONF_LIGHTS,
 	CONF_HOST,
 	CONF_PORT,
 )
@@ -21,7 +21,7 @@ from . import DATA_DEVICE_REGISTER, KConnection
 
 _LOGGER = logging.getLogger(__name__)
 
-SWITCH_SCHEMA = vol.Schema(
+LIGHTS_SCHEMA = vol.Schema(
 	{
 		vol.Optional(CONF_FRIENDLY_NAME): cv.string,
 		vol.Optional("k_id"): cv.string,
@@ -32,15 +32,14 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 	{
 		vol.Required(CONF_HOST): cv.string,
 		vol.Optional(CONF_PORT, default=4196): cv.port,
-		vol.Required(CONF_SWITCHES): cv.schema_with_slug_keys(SWITCH_SCHEMA)
+		vol.Required(CONF_LIGHTS): cv.schema_with_slug_keys(LIGHTS_SCHEMA)
 	}
 )
 
 
 def setup_platform(hass, config, add_entities, discovery_info=None):
-	"""Find and return switches controlled by shell commands."""
-	devices = config.get(CONF_SWITCHES, {})
-	switches = []
+	devices = config.get(CONF_LIGHTS, {})
+	lights = []
 
 	host = config.get(CONF_HOST, {})
 	port = config.get(CONF_PORT, {})
@@ -50,8 +49,8 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
 	for object_id, device_config in devices.items():
 
-		switches.append(
-			CommandSwitch(
+		lights.append(
+			CommandLight(
 				hass,
 				object_id,
 				device_config.get(CONF_FRIENDLY_NAME, object_id),
@@ -60,16 +59,14 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 			)
 		)
 
-	if not switches:
-		_LOGGER.error("No switches added")
+	if not lights:
+		_LOGGER.error("No lights added")
 		return False
 
-	add_entities(switches)
+	add_entities(lights)
 
 
-class CommandSwitch(SwitchDevice):
-	"""Representation a switch that can be toggled using shell commands."""
-
+class CommandLight(Light):
 	def __init__(
 		self,
 		hass,
@@ -78,7 +75,6 @@ class CommandSwitch(SwitchDevice):
 		k_id,
 		transport,
 	):
-		"""Initialize the switch."""
 		self._hass = hass
 		self.entity_id = ENTITY_ID_FORMAT.format(object_id)
 		self._name = friendly_name
@@ -93,7 +89,6 @@ class CommandSwitch(SwitchDevice):
 
 	@property
 	def name(self):
-		"""Return the name of the switch."""
 		return self._name
 
 	@property

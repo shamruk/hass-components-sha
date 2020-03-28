@@ -14,7 +14,6 @@ from homeassistant.const import (
 )
 
 DATA_DEVICE_REGISTER = "k_device_register"
-DATA_DEVICE_REGISTER_LOCK = "k_device_register_lock"
 DOMAIN = "kincony-sha"
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,6 +24,7 @@ class KTransport(object):
 	"""docstring for KTransport"""
 	def __init__(self):
 		super(KTransport, self).__init__()
+		self.lock = threading.Lock()
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.s.settimeout(5)
 		self.connected = False
@@ -38,13 +38,16 @@ class KTransport(object):
 	def setAddress(self, address):
 		self.address = address
 
+	def getLock(self):
+		return self.lock
+
 	def call(self, command):
 		if (not self.connected):
 			try:
 				self.s.connect(self.address)
 				self.connected = True
 			except:
-				_LOGGER.error("cannot connect socket " + self.address)
+				_LOGGER.error("cannot connect socket")
 
 		try:
 			self._send(command)
@@ -69,15 +72,13 @@ class KTransport(object):
 async def async_setup(hass, config):
 	_LOGGER.info("k init")
 	hass.data[DATA_DEVICE_REGISTER] = KTransport()
-	hass.data[DATA_DEVICE_REGISTER_LOCK] = threading.Lock()
 	return True
 
 class KConnection(object):
-	def __init__(self, s, index, lock):
+	def __init__(self, s, index):
 		super(KConnection, self).__init__()
 		self.s = s
 		self.index = index
-		self.lock = lock
 		
 	def send2K(self, action_type):
 		first_run = False
@@ -119,7 +120,7 @@ class KConnection(object):
 		return result
 
 	def send2KWithLock(self, action_type):
-		with self.lock:
+		with self.s.getLock():
 			result = self.send2K(action_type)
 		return result
 
