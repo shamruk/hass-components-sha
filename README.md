@@ -121,3 +121,13 @@ light:
 
 
 Restart Home Assistant
+
+Automation actions e.g.:
+```
+  action:
+  - entity_id: switch.ls_1
+    service: switch.turn_on
+  - entity_id: light.ls_17
+    service: light.turn_on
+```
+
