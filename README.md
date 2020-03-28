@@ -10,6 +10,8 @@ Add to `configuration.yaml`
 
 And don't forget to set device IP istead of `192.168.1.103`
 
+Relays could be added as `switches` or as `lights` (see example below)
+
 ```
 switch:
   - platform: kincony-sha
