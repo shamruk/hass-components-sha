@@ -1,7 +1,3 @@
-Known issues 
-
-socket stops working after BrokenPipeError
-
 Installation
 
 Using the tool of choice open the directory (folder) for your HA configuration (where you find configuration.yaml).
@@ -11,6 +7,8 @@ Download all the files from the `custom_components/kincony-sha/` directory (fold
 Place the files you downloaded in the new directory (folder) you created.
 
 Add to `configuration.yaml`
+
+And don't forget to set device IP istead of 192.168.1.103
 
 ```
 switch:
