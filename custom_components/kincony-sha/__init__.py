@@ -31,7 +31,7 @@ class KTransport(object):
 		return self.s.recv(1024).decode('utf-8')
 
 	def call(self, command):
-		if (not connected):
+		if (not self.connected):
 			try:
 				self.s.connect(self.address)
 				self.connected = True
