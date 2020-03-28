@@ -38,8 +38,8 @@ class KConnection(object):
 
 		try:
 			self.s.connect(address)
-		except BrokenPipeError:
-			_LOGGER.error("cannot connect socket")
+		except:
+			_LOGGER.debug("cannot connect socket")
 
 		if first_run:
 			self.s.sendto('RELAY-SCAN_DEVICE-NOW'.encode(), address)
