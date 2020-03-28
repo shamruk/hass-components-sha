@@ -54,7 +54,8 @@ class KTransport(object):
 async def async_setup(hass, config):
 	_LOGGER.info("k init")
 	default_ip = '192.168.1.103'
-	hass.data[DATA_DEVICE_REGISTER] = KTransport(address = (default_ip, 4196))
+	address = (default_ip, 4196)
+	hass.data[DATA_DEVICE_REGISTER] = KTransport(address)
 	hass.data[DATA_DEVICE_REGISTER_LOCK] = threading.Lock()
 	return True
 
