@@ -8,9 +8,14 @@ import os
 import subprocess
 import logging
 import threading
+from homeassistant.const import (
+    CONF_HOST,
+    CONF_PORT,
+)
 
 DATA_DEVICE_REGISTER = "k_device_register"
 DATA_DEVICE_REGISTER_LOCK = "k_device_register_lock"
+DOMAIN = "kincony-sha"
 
 _LOGGER = logging.getLogger(__name__)
 # _LOGGER.setLevel(logging.DEBUG)
@@ -36,7 +41,7 @@ class KTransport(object):
 				self.s.connect(self.address)
 				self.connected = True
 			except:
-				_LOGGER.error("cannot connect socket")
+				_LOGGER.error("cannot connect socket " + self.address)
 
 		try:
 			self._send(command)
@@ -53,8 +58,16 @@ class KTransport(object):
 
 async def async_setup(hass, config):
 	_LOGGER.info("k init")
-	default_ip = '192.168.1.103'
-	address = (default_ip, 4196)
+	try:
+		_LOGGER.warning(config.get(CONF_HOST, {}))
+		_LOGGER.warning(config.get(CONF_PORT, {}))
+	except:
+		_LOGGER.warning("fail")
+	host = '192.168.1.103'
+	#config[DOMAIN][CONF_HOST]
+	port = 4196
+	#config[DOMAIN][CONF_PORT]
+	address = (host, port)
 	hass.data[DATA_DEVICE_REGISTER] = KTransport(address)
 	hass.data[DATA_DEVICE_REGISTER_LOCK] = threading.Lock()
 	return True
