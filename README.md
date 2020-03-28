@@ -63,6 +63,10 @@ switch:
         ls_16:
             k_id: 16
             friendly_name: LS 16
+light: 
+  - platform: kincony-sha
+    host: 192.168.1.103
+    lights:
         ls_17:
             k_id: 17
             friendly_name: LS 17
