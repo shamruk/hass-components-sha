@@ -15,11 +15,46 @@ DATA_DEVICE_REGISTER_LOCK = "k_device_register_lock"
 _LOGGER = logging.getLogger(__name__)
 # _LOGGER.setLevel(logging.DEBUG)
 
-default_ip = '192.168.1.103'
+
+class KTransport(object):
+	"""docstring for KTransport"""
+	def __init__(self, address):
+		super(KTransport, self).__init__()
+		self.address = address
+		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.connected = False
+
+	def _send(self, command):
+		self.s.sendto(command.encode(), self.address)
+
+	def _read(self):
+		return self.s.recv(1024).decode('utf-8')
+
+	def call(self, command):
+		if (not connected):
+			try:
+				self.s.connect(self.address)
+				self.connected = True
+			except:
+				_LOGGER.error("cannot connect socket")
+
+		try:
+			self._send(command)
+		except BrokenPipeError:
+			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.connected = False
+			time.sleep(3)
+			self.call(command)
+
+		result = self._read()
+
+		return result
+
 
 async def async_setup(hass, config):
 	_LOGGER.info("k init")
-	hass.data[DATA_DEVICE_REGISTER] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	default_ip = '192.168.1.103'
+	hass.data[DATA_DEVICE_REGISTER] = KTransport(address = (default_ip, 4196))
 	hass.data[DATA_DEVICE_REGISTER_LOCK] = threading.Lock()
 	return True
 
@@ -33,22 +68,14 @@ class KConnection(object):
 	def send2K(self, action_type):
 		first_run = False
 		fix_every_time = False
-		kcode = '255'
-		address = (default_ip, 4196)
-
-		try:
-			self.s.connect(address)
-		except:
-			_LOGGER.debug("cannot connect socket")
+		kcode = '255'		
 
 		if first_run:
-			self.s.sendto('RELAY-SCAN_DEVICE-NOW'.encode(), address)
-			result = self.s.recv(1024).decode('utf-8')
+			result = self.s.call('RELAY-SCAN_DEVICE-NOW')
 			_LOGGER.info("scan:" + result)
 
 		if first_run or fix_every_time:
-			self.s.sendto('RELAY-TEST-NOW'.encode(), address)
-			result = self.s.recv(1024).decode('utf-8')
+			result = self.s.call('RELAY-TEST-NOW')
 			_LOGGER.info("test:" + result)
 
 		if action_type == 'on' and self.index == 'all':
@@ -68,8 +95,7 @@ class KConnection(object):
 		elif action_type == 'error':
 			command = 'zzz'
 
-		self.s.sendto(command.encode(), address)
-		result = self.s.recv(1024).decode('utf-8')
+		result = self.s.call(command, address)
 
 		# self.s.close()
 
@@ -91,12 +117,12 @@ class KConnection(object):
 
 
 	def turnOff(self):
-		result = self.send2KWithLock(action_type)
+		result = self.send2KWithLock('off')
 		x = re.match("RELAY-SET-\\d+,\\d+,(\\d+),OK", result)
 		if x.group(1) != "0":
 			_LOGGER.warning("exit 6")	
 
 	def getStatus(self):
-		result = self.send2KWithLock(action_type)
+		result = self.send2KWithLock('get')
 		x = re.match("RELAY-READ-\\d+,\\d+,(\\d+),OK", result)
 		return x.group(1) == "1"
