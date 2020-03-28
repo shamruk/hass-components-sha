@@ -95,7 +95,7 @@ class KConnection(object):
 		elif action_type == 'error':
 			command = 'zzz'
 
-		result = self.s.call(command, address)
+		result = self.s.call(command)
 
 		# self.s.close()
 
