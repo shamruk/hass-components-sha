@@ -15,6 +15,7 @@ Add to `configuration.yaml`
 ```
 switch:
   - platform: kincony-sha
+    host: 192.168.1.103
     switches:
         ls_1:
             k_id: 1
