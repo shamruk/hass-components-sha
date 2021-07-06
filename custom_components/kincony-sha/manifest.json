@@ -4,5 +4,6 @@
   "documentation": "https://github.com/shamruk/hass-components-sha",
   "requirements": [],
   "dependencies": [],
-  "codeowners": []
+  "codeowners": [],
+  "version": "1.1"
 }
