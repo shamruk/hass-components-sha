@@ -66,7 +66,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 	add_entities(lights)
 
 
-class CommandLight(Light):
+class CommandLight(SwitchEntity):
 	def __init__(
 		self,
 		hass,
