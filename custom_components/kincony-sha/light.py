@@ -5,7 +5,7 @@ import subprocess
 import voluptuous as vol
 
 from homeassistant.components.light import (
-	Light,
+	LightEntity,
 	ENTITY_ID_FORMAT,
 	PLATFORM_SCHEMA,
 )
