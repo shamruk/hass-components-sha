@@ -67,7 +67,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 	add_entities(switches)
 
 
-class CommandSwitch(SwitchDevice):
+class CommandSwitch(SwitchEntity):
 	"""Representation a switch that can be toggled using shell commands."""
 
 	def __init__(
