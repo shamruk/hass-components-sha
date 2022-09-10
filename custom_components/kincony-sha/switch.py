@@ -7,7 +7,7 @@ import voluptuous as vol
 from homeassistant.components.switch import (
 	ENTITY_ID_FORMAT,
 	PLATFORM_SCHEMA,
-	SwitchDevice,
+	SwitchEntity,
 )
 from homeassistant.const import (
 	CONF_FRIENDLY_NAME,
