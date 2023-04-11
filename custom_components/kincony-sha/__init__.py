@@ -60,8 +60,9 @@ class KTransport(object):
 
 		try:
 			result = self._read()
-		except:
+		except Exception as e:
 			_LOGGER.error("socket read error")
+			_LOGGER.error(e)
 			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.s.settimeout(5)
 			self.connected = False
@@ -139,5 +140,9 @@ class KConnection(object):
 
 	def getStatus(self):
 		result = self.send2KWithLock('get')
-		x = re.match("RELAY-READ-\\d+,\\d+,(\\d+),OK", result)
-		return x.group(1) == "1"
+		try:
+			x = re.match("RELAY-READ-\\d+,\\d+,(\\d+),OK", result)
+			return x.group(1) == "1"
+		except Exception as e:
+			_LOGGER.error(f'cannot get status for {self.index} - result was: {result}')
+			raise e

@@ -7,7 +7,7 @@ import voluptuous as vol
 from homeassistant.components.switch import (
 	ENTITY_ID_FORMAT,
 	PLATFORM_SCHEMA,
-	SwitchDevice,
+	SwitchEntity as SwitchDevice,
 )
 from homeassistant.const import (
 	CONF_FRIENDLY_NAME,
@@ -100,11 +100,6 @@ class CommandSwitch(SwitchDevice):
 	def is_on(self):
 		"""Return true if device is on."""
 		return self._state
-
-	@property
-	def assumed_state(self):
-		"""Return true if we do optimistic updates."""
-		return False
 
 	def update(self):
 		self._state = self._clinet.getStatus()
